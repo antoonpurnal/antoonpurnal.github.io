@@ -21,7 +21,7 @@ My interests include microarchitectural attacks and defenses, as well as efficie
 
 - [Hardware Security](https://onderwijsaanbod.kuleuven.be/syllabi/e/H0E85AE.htm#activetab=doelstellingen_idp14987280): main teaching assistant
 - Supervision of several MSc thesis students
-- Ombudsperson for the MSc in Electrical Engineering at KU Leuven.
+- Ombudsperson for the MSc in Electrical Engineering at KU Leuven
     - KU Leuven students can find more info [here](https://eng.kuleuven.be/en/study/student-services/ombuds_masterE.html)
 
 ## Previous 
@@ -29,7 +29,7 @@ My interests include microarchitectural attacks and defenses, as well as efficie
 - Student TA for Electromagnetic Waves (2017-2018), Problem Solving & Design (2017) and Calculus I and III (2017)
 
 ## Peer reviewing (external)
-- USENIX Security 2022, 2021, 2020, 2022
+- USENIX Security 2022, 2021, 2020, 2019
 - COSADE 2022
 - IEEE EuroS&P 2021
 - HOST 2020
