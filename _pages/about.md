@@ -11,7 +11,7 @@ redirect_from:
 I am a PhD researcher (FWO Fellow) in the [COSIC](https://www.esat.kuleuven.be/cosic/) group at [KU Leuven](https://www.kuleuven.be/english/), under the supervision of professor Ingrid Verbauwhede.
 My interests include microarchitectural attacks and defenses, as well as efficient and secure cryptographic implementations.
 During the summer of 2022, I interned at Intel Labs.
-I will graduate mid-2023.
+I will obtain my PhD degree in June 2023.
 
 # Selected Publications
 {% for post in site.publications reversed %}
