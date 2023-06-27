@@ -1,5 +1,5 @@
 ---
-title: “Cache Side-Channel Attacks on Existing and Emerging Computing Platforms”
+title: "Cache Side-Channel Attacks on Existing and Emerging Computing Platforms"
 collection: publications
 paperurl: '/files/pdf/PhDThesis.pdf'
 venue: "PhD Dissertation"
