@@ -8,9 +8,10 @@ redirect_from:
   - /about.html
 ---
 
-In June 2023, I obtained my PhD degree, entitled ["Cache Side-Channel Attacks on Existing and Emerging Computing Platforms"]({{ site.url }}/files/pdf/PhDThesis.pdf), at the [COSIC](https://esat.kuleuven.be/cosic/) group at [KU Leuven](https://kuleuven.be/english/).
 My interests include microarchitectural attacks and defenses, as well as efficient and secure cryptographic implementations.
+In June 2023, I obtained my PhD degree, entitled ["Cache Side-Channel Attacks on Existing and Emerging Computing Platforms"]({{ site.url }}/files/pdf/PhDThesis.pdf), at the [COSIC](https://esat.kuleuven.be/cosic/) group at [KU Leuven](https://kuleuven.be/english/).
 During the summer of 2022, I interned at Intel Labs.
+
 In August 2023, I joined [PQShield](https://pqshield.com/) as a Cryptography Security Analyst.
 
 # Selected Publications
@@ -21,8 +22,8 @@ In August 2023, I joined [PQShield](https://pqshield.com/) as a Cryptography Sec
 <br>
 # Teaching & Service 
 
-## Peer reviewing (external)
-- CHES 2024
+## Peer review
+- TCHES 2024
 - External: USENIX Security 2023, 2022, 2021, 2020, 2019
 - External: COSADE 2022
 - External: IEEE EuroS&P 2021
