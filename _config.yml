@@ -10,7 +10,7 @@ locale                   : "en-US"
 title                    : "Antoon Purnal"
 title_separator          : "-"
 name                     : &name "Antoon Purnal (Toon)"
-description              : &description "Cryptography Security Analyst at PQShield"
+description              : &description "Senior Product Security Analyst at PQShield"
 url                      : https://antoonpurnal.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "antoonpurnal/antoonpurnal.github.io"
@@ -82,7 +82,7 @@ analytics:
 author:
   name             : "Antoon Purnal (Toon)"
   avatar           : "foto_2022.jpg"
-  bio              : "Cryptography Security Analyst at PQShield"
+  bio              : "Senior Product Security Analyst at PQShield"
   location         : "Leuven, BE"
   employer         :
   pubmed           : 
