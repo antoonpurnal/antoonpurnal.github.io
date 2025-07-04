@@ -8,11 +8,13 @@ redirect_from:
   - /about.html
 ---
 
-My interests include microarchitectural attacks and defenses, as well as efficient and secure cryptographic implementations.
-I obtained my PhD degree, entitled ["Cache Side-Channel Attacks on Existing and Emerging Computing Platforms"]({{ site.url }}/files/pdf/PhDThesis.pdf), at the [COSIC](https://esat.kuleuven.be/cosic/) group at [KU Leuven](https://kuleuven.be/english/) in June 2023.
-During the summer of 2022, I interned at Intel Labs.
 
-In August 2023, I joined [PQShield](https://pqshield.com/) as a Senior Product Security Analyst.
+I am a Silicon Security Engineer at Google. Before that, I was a Senior Product Security Analyst at [PQShield](https://pqshield.com/).
+Before that, I obtained my PhD degree, entitled ["Cache Side-Channel Attacks on Existing and Emerging Computing Platforms"]({{ site.url }}/files/pdf/PhDThesis.pdf), at the [COSIC](https://esat.kuleuven.be/cosic/) group at [KU Leuven](https://kuleuven.be/english/) in June 2023. During the summer of 2022, I interned at Intel Labs.
+
+My professional interests are centered around {microarchitectural,software,hardware} security, as well as engineering efficient and secure cryptographic implementations.
+
+In 2024, I found an exploitable (compiler-introduced) timing side-channel vulnerability in several implementations of ML-KEM ([blog](https://pqshield.com/pqshield-plugs-timing-leaks-in-kyber-ml-kem-to-improve-pqc-implementation-maturity/), [code](https://github.com/antoonpurnal/clangover)).
 
 # Selected Publications
 {% for post in site.publications reversed %}
@@ -20,19 +22,10 @@ In August 2023, I joined [PQShield](https://pqshield.com/) as a Senior Product S
 {% endfor %}
 
 <br>
-# Teaching & Service 
-
-## Peer review
+# Reviewing
 - TCHES 2024
 - External: USENIX Security 2023, 2022, 2021, 2020, 2019
 - External: COSADE 2022
 - External: IEEE EuroS&P 2021
 - External: HOST 2020
 - External: ESSCIRC 2019
-
-## Previous 
-- [Hardware Security](https://onderwijsaanbod.kuleuven.be/syllabi/e/H0E85AE.htm#activetab=doelstellingen_idp14987280): main teaching assistant
-- Supervision of several MSc thesis students
-- Ombudsperson for the MSc in Electrical Engineering at KU Leuven
-- [Applied Algebra](https://onderwijsaanbod.kuleuven.be/syllabi/v/e/H01A4BE.htm#activetab=doelstellingen_idp5081088): teaching assistant
-- Student TA for Electromagnetic Waves (2017-2018), Problem Solving & Design (2017) and Calculus I and III (2017)
