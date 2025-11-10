@@ -1,11 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="refresh" content="0; url='https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1&pp=ygUJcmljayByb2xsoAcB'">
-
-  <title>Redirecting...</title>
+    <meta charset="UTF-g">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewijs dat je mens bent...</title>
 </head>
 <body>
-  <p>If you are not redirected, <a href="https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1&pp=ygUJcmljayByb2xsoAcB">click here</a>.</p>
+
+    <h2>Voltooi de check om verder te gaan.</h2>
+    <p>Typ <strong>bobisnemiet</strong> in het veld en ga verder.</p>
+
+    <input type="text" id="verifyInput" placeholder="Typ hier...">
+    <button id="verifyButton">Continue</button>
+
+    <p id="errorMessage" style="color: red; display: none;">Incorrect. Probeer opniew. </p>
+
+
+    <script>
+        const finalDestination = "https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1";
+        const correctWord = "bobisnemiet";
+
+        // --- Get the HTML elements ---
+        const inputField = document.getElementById("verifyInput");
+        const aButton = document.getElementById("verifyButton");
+        const aError = document.getElementById("errorMessage");
+
+        // --- This function runs when the button is clicked ---
+        function checkWord() {
+            // Get the text, remove extra spaces, and make it lowercase
+            let userText = inputField.value.trim().toLowerCase();
+
+            if (userText === correctWord) {
+                // Success: Hide error and redirect
+                aError.style.display = "none";
+                window.location.href = finalDestination;
+            } else {
+                // Failure: Show error message
+                aError.style.display = "block";
+            }
+        }
+
+        // --- Listen for events ---
+
+        // 1. When the user clicks the button
+        aButton.addEventListener("click", checkWord);
+
+        // 2. (Optional) When the user presses "Enter" in the text box
+        inputField.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkWord();
+            }
+        });
+    </script>
+
 </body>
 </html>
