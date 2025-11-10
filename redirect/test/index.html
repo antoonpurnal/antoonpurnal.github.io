@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-g">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bewijs dat je mens bent...</title>
 </head>
@@ -19,6 +19,7 @@
     <script>
         const finalDestination = "https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1";
         const correctWord = "bobisnemiet";
+        const otherWord = "toonisnemiet";
 
         // --- Get the HTML elements ---
         const inputField = document.getElementById("verifyInput");
@@ -34,8 +35,13 @@
                 // Success: Hide error and redirect
                 aError.style.display = "none";
                 window.location.href = finalDestination;
+            } else if (userText === otherWord) {
+                // Success: Hide error and redirect
+                aError.innerText = "Goed geprobeerd, Bob.";
+                aError.style.display = "block";
             } else {
                 // Failure: Show error message
+                aError.innerText = "Incorrect. Probeer opnieuw. Typ 'bobisnemiet' in het veld.";
                 aError.style.display = "block";
             }
         }
