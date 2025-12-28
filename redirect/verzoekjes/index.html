@@ -7,12 +7,13 @@
 </head>
 <body>
 
-    <h2>Voltooi de check om verder te gaan.</h2>
+    <h2>Om verder te gaan, bewijs dat je een mens bent.</h2>
 
-    <img src="captcha.png" alt="Captcha">
+    <img src="captcha.png" alt="Captcha" style="width: 400px; height: auto;">
 
     <br><br>
 
+    <p>Voer de tekst uit de afbeelding in om te verifiëren.</p>
     <input type="text" id="verifyInput" placeholder="Typ hier...">
     <button id="verifyButton">Continue</button>
 
@@ -33,7 +34,7 @@
         // --- This function runs when the button is clicked ---
         function checkWord() {
             // Get the text, remove extra spaces, and make it lowercase
-            let userText = inputField.value.trim().toLowerCase();
+            let userText = inputField.value.replace(/\s+/g, '').toLowerCase();
 
             if (userText === correctWord) {
                 // Success: Hide error and redirect
@@ -47,7 +48,7 @@
                 // Wait 1 second (1000ms) before redirecting
                 setTimeout(function() {
                     window.location.href = otherDestination;
-                }, 1000);
+                }, 2000);
             } else {
                 // Failure: Show error message
                 aError.innerText = "Incorrect. Probeer opnieuw. Typ 'bobisnemiet' in het veld.";
