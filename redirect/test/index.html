@@ -8,7 +8,10 @@
 <body>
 
     <h2>Voltooi de check om verder te gaan.</h2>
-    <p>Typ <strong>bobisnemiet</strong> in het veld en ga verder.</p>
+
+    <img src="captcha.png" alt="Captcha">
+
+    <br><br>
 
     <input type="text" id="verifyInput" placeholder="Typ hier...">
     <button id="verifyButton">Continue</button>
@@ -17,7 +20,8 @@
 
 
     <script>
-        const finalDestination = "https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1";
+        const finalDestination = "https://forms.gle/NWpPw54odLzGKPev8";
+        const otherDestination = "https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0&start_radio=1";
         const correctWord = "bobisnemiet";
         const otherWord = "toonisnemiet";
 
@@ -36,9 +40,14 @@
                 aError.style.display = "none";
                 window.location.href = finalDestination;
             } else if (userText === otherWord) {
-                // Success: Hide error and redirect
+                // Easter egg message
                 aError.innerText = "Goed geprobeerd, Bob.";
                 aError.style.display = "block";
+
+                // Wait 1 second (1000ms) before redirecting
+                setTimeout(function() {
+                    window.location.href = otherDestination;
+                }, 1000);
             } else {
                 // Failure: Show error message
                 aError.innerText = "Incorrect. Probeer opnieuw. Typ 'bobisnemiet' in het veld.";
