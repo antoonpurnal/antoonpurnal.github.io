@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flappy Face</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: monospace;
+      }
+      canvas {
+        background-color: #70c5ce; /* Sky blue */
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      }
+      #game-over {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 10px;
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #70c5ce;
+        border: none;
+        color: white;
+        border-radius: 5px;
+      }
+    </style>
+    <script type="module" crossorigin src="/flappy/assets/index-B25c9JZ3.js"></script>
+  </head>
+  <body>
+    <canvas id="gameCanvas" width="320" height="480"></canvas>
+    
+    <div id="game-over">
+        <h1>Game Over!</h1>
+        <p>Score: <span id="score">0</span></p>
+        <button id="restartBtn">Play Again</button>
+    </div>
+
+  </body>
+</html>
