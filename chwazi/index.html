@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chwazi Web</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --accent-color: #00e5ff;
+            --circle-size: 80px;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            touch-action: none; /* Prevent browser zooming/scrolling */
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- UI Overlay (Settings) --- */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(26, 26, 26, 0.95);
+            z-index: 100;
+            transition: opacity 0.3s ease;
+        }
+
+        #ui-layer.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #00e5ff, #ff00ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+
+        .toggle-container {
+            display: flex;
+            background: #333;
+            border-radius: 25px;
+            padding: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.5rem;
+            text-align: center;
+            background: #333;
+            border: 2px solid #444;
+            border-radius: 10px;
+            color: white;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--accent-color);
+        }
+
+        #start-btn {
+            margin-top: 1rem;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, #00e5ff, #00b8cc);
+            border: none;
+            border-radius: 30px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.4);
+            transition: transform 0.1s;
+        }
+
+        #start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* --- Game Area --- */
+        #game-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+        }
+
+        .finger {
+            position: absolute;
+            width: var(--circle-size);
+            height: var(--circle-size);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            border: 4px solid white;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s, background-color 0.3s;
+            pointer-events: none; /* Let touches pass through to the container */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: rgba(0,0,0,0.7);
+        }
+
+        .finger.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .finger.winner {
+            background-color: #fff !important;
+            box-shadow: 0 0 40px #fff, 0 0 80px var(--color);
+            border-color: var(--color);
+            transform: translate(-50%, -50%) scale(1.2);
+            z-index: 20;
+        }
+
+        .finger.loser {
+            opacity: 0.2;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+
+        /* Loading Ring Animation */
+        .loader-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            border: 4px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            text-align: center;
+            color: #666;
+            font-size: 1rem;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        /* Reset Button (Top Right) */
+        #reset-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            background: rgba(50, 50, 50, 0.5);
+            border: 1px solid #666;
+            color: #ccc;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- UI Overlay -->
+    <div id="ui-layer">
+        <h1>Chwazi Web</h1>
+        
+        <div class="control-group">
+            <label>Mode</label>
+            <div class="toggle-container">
+                <button class="toggle-btn active" id="mode-winners" onclick="setMode('winners')">Pick Winners</button>
+                <button class="toggle-btn" id="mode-teams" onclick="setMode('teams')">Groups</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label id="input-label">Number of Winners</label>
+            <input type="number" id="config-number" value="1" min="1" max="10">
+        </div>
+
+        <button id="start-btn" onclick="startGame()">Start</button>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-area"></div>
+    <div id="instructions">Place fingers on the screen...</div>
+    <button id="reset-btn" onclick="resetUI()">Configure</button>
+
+    <script>
+        // --- State ---
+        let config = {
+            mode: 'winners', // 'winners' or 'teams'
+            number: 1
+        };
+        let gameState = {
+            active: false,
+            selecting: false,
+            finished: false,
+            timer: null
+        };
+        
+        // Map pointerId -> { element, x, y, color }
+        const pointers = new Map();
+        const colors = ['#FF0055', '#00FF66', '#0055FF', '#FFFF00', '#FF9900', '#CC00FF', '#00FFFF', '#FF00CC'];
+
+        // --- DOM Elements ---
+        const uiLayer = document.getElementById('ui-layer');
+        const gameArea = document.getElementById('game-area');
+        const inputLabel = document.getElementById('input-label');
+        const configInput = document.getElementById('config-number');
+        const instructions = document.getElementById('instructions');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // --- UI Logic ---
+        function setMode(mode) {
+            config.mode = mode;
+            document.getElementById('mode-winners').classList.toggle('active', mode === 'winners');
+            document.getElementById('mode-teams').classList.toggle('active', mode === 'teams');
+            
+            if (mode === 'winners') {
+                inputLabel.innerText = "Number of Winners";
+                configInput.value = 1;
+            } else {
+                inputLabel.innerText = "Number of Groups";
+                configInput.value = 2;
+            }
+        }
+
+        function startGame() {
+            config.number = parseInt(configInput.value) || 1;
+            uiLayer.classList.add('hidden');
+            gameState.active = true;
+            resetBtn.style.display = 'block';
+            instructions.style.opacity = 1;
+        }
+
+        function resetUI() {
+            // Full reset
+            pointers.forEach(p => p.element.remove());
+            pointers.clear();
+            gameState.active = false;
+            gameState.selecting = false;
+            gameState.finished = false;
+            clearTimeout(gameState.timer);
+            
+            uiLayer.classList.remove('hidden');
+            resetBtn.style.display = 'none';
+        }
+
+        // --- Game Logic ---
+
+        // Palette generator for fingers
+        function getColor(id) {
+            return colors[id % colors.length];
+        }
+
+        function createFinger(id, x, y) {
+            const el = document.createElement('div');
+            el.className = 'finger active';
+            const color = getColor(pointers.size); // Assign based on current count
+            el.style.borderColor = color;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.setProperty('--color', color);
+            
+            // Add spinner (hidden by default)
+            const spinner = document.createElement('div');
+            spinner.className = 'loader-ring';
+            el.appendChild(spinner);
+
+            gameArea.appendChild(el);
+            return { element: el, color: color, id: id };
+        }
+
+        function updateSelectionLogic() {
+            // Cancel existing timer
+            clearTimeout(gameState.timer);
+            gameState.selecting = false;
+
+            // Reset visual state if we were selecting
+            pointers.forEach(p => {
+                p.element.querySelector('.loader-ring').style.display = 'none';
+            });
+
+            if (pointers.size > 0 && !gameState.finished) {
+                instructions.style.opacity = 0;
+                
+                // Requirement check
+                const required = config.mode === 'teams' ? config.number : config.number + 1; 
+                
+                if (pointers.size >= 1) { 
+                     // Start countdown logic
+                    gameState.selecting = true;
+                    
+                    // Show spinners
+                    pointers.forEach(p => {
+                        p.element.querySelector('.loader-ring').style.display = 'block';
+                    });
+
+                    // Wait 2.5 seconds of stability
+                    gameState.timer = setTimeout(finalizeSelection, 2500);
+                }
+            } else if (pointers.size === 0) {
+                instructions.style.opacity = 1;
+                // If everyone lifts fingers after finish, reset state to allow new round immediately
+                if (gameState.finished) {
+                     gameState.finished = false;
+                     instructions.innerText = "Place fingers to play again";
+                     instructions.style.opacity = 1;
+                }
+            }
+        }
+
+        function finalizeSelection() {
+            gameState.selecting = false;
+            gameState.finished = true;
+            pointers.forEach(p => {
+                p.element.querySelector('.loader-ring').style.display = 'none';
+            });
+
+            const pArray = Array.from(pointers.values());
+            
+            if (config.mode === 'winners') {
+                // RIGGED: Always select the first touch as the winner
+                const winnersCount = Math.min(config.number, pArray.length);
+                let winners = [];
+                let losers = [];
+
+                if (pArray.length > 0) {
+                    // Identify the first touch (first element in insertion-ordered map)
+                    const firstTouch = pArray[0];
+                    
+                    // The rest of the players
+                    const others = pArray.slice(1);
+                    // Shuffle the rest to maintain randomness for everyone else
+                    const othersShuffled = others.sort(() => 0.5 - Math.random());
+                    
+                    // Construct winners list: ensure firstTouch is always included
+                    winners = [firstTouch, ...othersShuffled.slice(0, winnersCount - 1)];
+                    
+                    // The remaining are losers
+                    // Set subtraction: all - winners
+                    const winnerSet = new Set(winners);
+                    losers = pArray.filter(p => !winnerSet.has(p));
+                }
+
+                winners.forEach(p => {
+                    p.element.classList.add('winner');
+                    p.element.style.backgroundColor = p.color; // Winner fills with their color
+                });
+                losers.forEach(p => p.element.classList.add('loser'));
+                
+            } else if (config.mode === 'teams') {
+                // Divide into M teams (Standard logic for teams)
+                const teamCount = config.number;
+                const teamColors = colors.slice(0, teamCount); 
+                
+                const shuffled = pArray.sort(() => 0.5 - Math.random());
+                
+                shuffled.forEach((p, index) => {
+                    const teamIndex = index % teamCount;
+                    const assignedColor = teamColors[teamIndex];
+                    
+                    p.element.classList.add('winner');
+                    p.element.style.borderColor = assignedColor;
+                    p.element.style.backgroundColor = assignedColor;
+                    p.element.style.boxShadow = `0 0 20px ${assignedColor}`;
+                    p.element.style.setProperty('--color', assignedColor);
+                });
+            }
+        }
+
+        // --- Pointer Events ---
+        
+        gameArea.addEventListener('pointerdown', (e) => {
+            if (!gameState.active) return;
+            // If we are finished and someone touches, reset everything for a new round
+            if (gameState.finished) {
+                 pointers.forEach(p => p.element.remove());
+                 pointers.clear();
+                 gameState.finished = false;
+                 instructions.innerText = "Place fingers...";
+            }
+
+            const p = createFinger(e.pointerId, e.clientX, e.clientY);
+            pointers.set(e.pointerId, p);
+            el = p.element; // fix context if needed
+            el.setPointerCapture(e.pointerId);
+            
+            updateSelectionLogic();
+        });
+
+        gameArea.addEventListener('pointermove', (e) => {
+            if (pointers.has(e.pointerId)) {
+                const p = pointers.get(e.pointerId);
+                p.element.style.left = e.clientX + 'px';
+                p.element.style.top = e.clientY + 'px';
+            }
+        });
+
+        const removePointer = (e) => {
+            if (pointers.has(e.pointerId)) {
+                const p = pointers.get(e.pointerId);
+                p.element.remove();
+                pointers.delete(e.pointerId);
+                updateSelectionLogic();
+            }
+        };
+
+        gameArea.addEventListener('pointerup', removePointer);
+        gameArea.addEventListener('pointercancel', removePointer);
+        gameArea.addEventListener('pointerleave', removePointer);
+
+    </script>
+</body>
+</html>
