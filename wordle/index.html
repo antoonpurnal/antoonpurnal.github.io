@@ -94,7 +94,7 @@
             padding: 10px;
             box-sizing: border-box;
             /* Ensure it doesn't overflow horizontally */
-            max-width: 100%; 
+            max-width: 100%;
         }
 
         .row {
@@ -119,13 +119,13 @@
             animation: pop 0.1s;
         }
 
-        .tile.correct { background-color: var(--color-correct); border-color: var(--color-correct); }
-        .tile.present { background-color: var(--color-present); border-color: var(--color-present); }
-        .tile.absent { background-color: var(--color-absent); border-color: var(--color-absent); }
-        
+        .tile.correct { background-color: var(--color-correct) !important; border-color: var(--color-correct) !important; color: white !important; }
+        .tile.present { background-color: var(--color-present) !important; border-color: var(--color-present) !important; color: white !important; }
+        .tile.absent { background-color: var(--color-absent) !important; border-color: var(--color-absent) !important; color: white !important; }
+
         .tile.space {
             border: none;
-            background-color: transparent;
+            background-color: transparent !important;
         }
 
         @keyframes pop {
@@ -170,6 +170,10 @@
             text-transform: uppercase;
             -webkit-tap-highlight-color: transparent;
         }
+
+        .key.correct { background-color: var(--color-correct) !important; color: white !important; }
+        .key.present { background-color: var(--color-present) !important; color: white !important; }
+        .key.absent { background-color: var(--color-absent) !important; color: white !important; }
 
         .key.wide {
             flex: 1.5;
@@ -238,7 +242,10 @@
             { id: 6, word: "lamas" },
             { id: 7, word: "luipaard" },
             { id: 8, word: "judoka" },
-            { id: 9, word: "lintworm" }
+            { id: 9, word: "lintworm" },
+            { id: 10, word: "tinder" },
+            { id: 11, word: "helmke" },
+            { id: 12, word: "chemie" }
         ];
 
         let currentLevelIndex = 0;
@@ -271,14 +278,14 @@
             currentLevelIndex = index;
             const levelData = levels[index];
             targetWord = levelData.word.toUpperCase();
-            
+
             // Calculate word length excluding spaces
             wordLength = targetWord.length; // Actually we keep spaces in grid but skip them in logic?
             // "man bijt hond" length is 13.
-            
+
             // Rule: 4-letter words get 5 guesses
-            // Filter non-space chars to check "word" length? 
-            // The prompt said "4-letter words also get 5 guesses". 
+            // Filter non-space chars to check "word" length?
+            // The prompt said "4-letter words also get 5 guesses".
             // Assuming this refers to the 'clean' length or the total slots.
             // None of the words are 4 letters, but let's implement the rule generally.
             const cleanLength = targetWord.replace(/ /g, '').length;
@@ -305,12 +312,12 @@
 
         function drawBoard() {
             board.innerHTML = '';
-            
+
             // Adjust tile size based on length to fit screen
             const availableWidth = Math.min(window.innerWidth - 20, 500); // 20px padding
             const gap = 5;
             const tileSize = Math.floor((availableWidth - (targetWord.length - 1) * gap) / targetWord.length);
-            
+
             // Clamp tile size
             const finalTileSize = Math.max(20, Math.min(60, tileSize));
 
@@ -321,7 +328,7 @@
                 row.style.gridTemplateRows = `${finalTileSize}px`;
 
                 const guess = guesses[i] || "";
-                
+
                 // If it's the current editing row
                 const isCurrentRow = (i === guesses.length && !gameOver);
 
@@ -343,7 +350,7 @@
                             // Or, easier: keep spaces in currentGuess?
                             // Let's decide: currentGuess will ONLY contain letters.
                             // We map it to the grid.
-                            
+
                             // Count how many non-space chars before j
                             const cleanTargetBefore = targetWord.substring(0, j).replace(/ /g, '').length;
                             if (cleanTargetBefore < currentGuess.length) {
@@ -366,15 +373,15 @@
         }
 
         function getTileColor(guess, index) {
-            // Logic to determine color. 
+            // Logic to determine color.
             // Note: guess and targetWord have spaces at same positions if we enforce it.
             // But let's handle "guess" as the full string including spaces.
-            
+
             const letter = guess[index];
             if (!letter || letter === ' ') return 'space';
-            
+
             const targetChar = targetWord[index];
-            
+
             if (targetChar === letter) {
                 return 'correct';
             }
@@ -385,16 +392,16 @@
             // 1. Identify corrects.
             // 2. Count remaining frequencies in target.
             // 3. Mark present if available.
-            
+
             // Let's do a full pass for the row colors
-            // But here we need to return for specific index. 
+            // But here we need to return for specific index.
             // It's cleaner to pre-calculate colors for the row, but we can compute on fly.
-            
+
             let targetFreq = {};
             let guessFreq = {}; // counts of 'correct' or 'present' assigned so far
-            
+
             // Calculate target frequency ignoring 'correct' matches elsewhere?
-            // Standard way: 
+            // Standard way:
             // Count total letters in target
             for (const char of targetWord) {
                 if(char !== ' ') targetFreq[char] = (targetFreq[char] || 0) + 1;
@@ -410,11 +417,11 @@
             // Now check if current index is yellow
             // We need to know if this specific instance of the letter should be yellow.
             // It gets priority from left to right for the remaining available counts.
-            
+
             let isYellow = false;
             // Count how many of this letter appear before this index in the guess that were NOT green
             // and use up the quota.
-            
+
             let matchesBefore = 0;
             for(let k = 0; k < index; k++) {
                 const gChar = guess[k];
@@ -492,16 +499,16 @@
             for (let i = 0; i < guess.length; i++) {
                 const char = guess[i];
                 if (char === ' ') continue;
-                
+
                 const colorClass = getTileColor(guess, i);
                 const key = document.querySelector(`.key[data-key="${char}"]`);
-                
+
                 if (key) {
                     // Priority: Correct > Present > Absent
                     const currentClass = key.classList.contains('correct') ? 'correct' :
                                          key.classList.contains('present') ? 'present' :
                                          key.classList.contains('absent') ? 'absent' : '';
-                    
+
                     if (colorClass === 'correct') {
                         key.className = `key ${key.classList.contains('wide')?'wide':''} correct`;
                     } else if (colorClass === 'present' && currentClass !== 'correct') {
@@ -539,7 +546,7 @@
                 showMessage("Not enough letters");
                 return;
             }
-            
+
             // Reconstruct full string with spaces for validation/display
             let fullGuess = "";
             let ptr = 0;
@@ -554,14 +561,14 @@
 
             // Since we don't have a dictionary, we accept any combination
             // (Standard Wordle checks dictionary here)
-            
+
             submitGuess(fullGuess);
         }
 
         function submitGuess(fullGuess) {
             guesses.push(fullGuess);
             currentGuess = "";
-            
+
             drawBoard();
             updateKeyboard(fullGuess);
 
@@ -593,7 +600,7 @@
         document.addEventListener('keydown', (e) => {
             if (gameOver) return;
             const key = e.key.toUpperCase();
-            
+
             if (key === 'ENTER') {
                 handleEnter();
             } else if (key === 'BACKSPACE') {
