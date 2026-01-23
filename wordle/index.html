@@ -1,14 +1,593 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/wordle/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lucky Wordle</title>
-    <script type="module" crossorigin src="/wordle/assets/index-D9ldpaiD.js"></script>
-    <link rel="stylesheet" crossorigin href="/wordle/assets/index-BZWa4M6j.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wordle</title>
+    <style>
+        :root {
+            --color-correct: #538d4e;
+            --color-present: #b59f3b;
+            --color-absent: #3a3a3c;
+            --color-default: #121213;
+            --color-border: #3a3a3c;
+            --color-text: #ffffff;
+            --key-bg: #818384;
+            --key-text: #ffffff;
+        }
+
+        body {
+            background-color: var(--color-default);
+            color: var(--color-text);
+            font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            border-bottom: 1px solid var(--color-border);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.1rem;
+            text-transform: uppercase;
+        }
+
+        #level-select {
+            background: var(--color-default);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        #game-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        #board-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            overflow: auto;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #board {
+            display: grid;
+            grid-gap: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .row {
+            display: grid;
+            grid-gap: 5px;
+        }
+
+        .tile {
+            border: 2px solid var(--color-border);
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        .tile.filled {
+            border-color: #565758;
+            animation: pop 0.1s;
+        }
+
+        .tile.correct { background-color: var(--color-correct); border-color: var(--color-correct); }
+        .tile.present { background-color: var(--color-present); border-color: var(--color-present); }
+        .tile.absent { background-color: var(--color-absent); border-color: var(--color-absent); }
+        
+        .tile.space {
+            border: none;
+            background-color: transparent;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        #keyboard {
+            width: 100%;
+            max-width: 500px;
+            padding: 0 8px 8px 8px;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 0 auto 8px;
+            touch-action: manipulation;
+        }
+
+        .key {
+            font-family: inherit;
+            font-weight: bold;
+            border: 0;
+            padding: 0;
+            margin: 0 3px;
+            height: 58px;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            background-color: var(--key-bg);
+            color: var(--key-text);
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .key.wide {
+            flex: 1.5;
+            font-size: 12px;
+        }
+
+        #message-container {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .message {
+            background-color: white;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .message.fade-out {
+            opacity: 0;
+        }
+
+        /* Mobile adjustments */
+        @media (max-height: 600px) {
+            .tile { font-size: 1.5rem; }
+            .key { height: 45px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Wordle</h1>
+        <select id="level-select" onchange="changeLevel(this.value)"></select>
+    </header>
+
+    <div id="message-container"></div>
+
+    <div id="game-container">
+        <div id="board-container">
+            <div id="board"></div>
+        </div>
+        <div id="keyboard"></div>
+    </div>
+
+    <script>
+        const levels = [
+            { id: 1, word: "lucky" },
+            { id: 2, word: "stekker" },
+            { id: 3, word: "knapje" },
+            { id: 4, word: "siegens" },
+            { id: 5, word: "man bijt hond" },
+            { id: 6, word: "lamas" },
+            { id: 7, word: "luipaard" },
+            { id: 8, word: "judoka" },
+            { id: 9, word: "lintworm" }
+        ];
+
+        let currentLevelIndex = 0;
+        let targetWord = "";
+        let guesses = [];
+        let currentGuess = "";
+        let maxGuesses = 6;
+        let gameOver = false;
+        let wordLength = 5;
+
+        const board = document.getElementById('board');
+        const keyboardContainer = document.getElementById('keyboard');
+        const levelSelect = document.getElementById('level-select');
+
+        function init() {
+            // Populate Level Select
+            levels.forEach((lvl, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Level ${lvl.id}`;
+                levelSelect.appendChild(option);
+            });
+
+            // Set initial level
+            loadLevel(0);
+            createKeyboard();
+        }
+
+        function loadLevel(index) {
+            currentLevelIndex = index;
+            const levelData = levels[index];
+            targetWord = levelData.word.toUpperCase();
+            
+            // Calculate word length excluding spaces
+            wordLength = targetWord.length; // Actually we keep spaces in grid but skip them in logic?
+            // "man bijt hond" length is 13.
+            
+            // Rule: 4-letter words get 5 guesses
+            // Filter non-space chars to check "word" length? 
+            // The prompt said "4-letter words also get 5 guesses". 
+            // Assuming this refers to the 'clean' length or the total slots.
+            // None of the words are 4 letters, but let's implement the rule generally.
+            const cleanLength = targetWord.replace(/ /g, '').length;
+            if (cleanLength === 4) {
+                maxGuesses = 5;
+            } else {
+                maxGuesses = 6;
+            }
+
+            guesses = [];
+            currentGuess = "";
+            gameOver = false;
+            levelSelect.value = index;
+
+            drawBoard();
+            resetKeyboard();
+        }
+
+        function changeLevel(val) {
+            loadLevel(parseInt(val));
+            // Remove focus from select to allow keyboard input
+            document.getElementById('level-select').blur();
+        }
+
+        function drawBoard() {
+            board.innerHTML = '';
+            
+            // Adjust tile size based on length to fit screen
+            const availableWidth = Math.min(window.innerWidth - 20, 500); // 20px padding
+            const gap = 5;
+            const tileSize = Math.floor((availableWidth - (targetWord.length - 1) * gap) / targetWord.length);
+            
+            // Clamp tile size
+            const finalTileSize = Math.max(20, Math.min(60, tileSize));
+
+            for (let i = 0; i < maxGuesses; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                row.style.gridTemplateColumns = `repeat(${targetWord.length}, ${finalTileSize}px)`;
+                row.style.gridTemplateRows = `${finalTileSize}px`;
+
+                const guess = guesses[i] || "";
+                
+                // If it's the current editing row
+                const isCurrentRow = (i === guesses.length && !gameOver);
+
+                for (let j = 0; j < targetWord.length; j++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    const charAtJ = targetWord[j];
+
+                    if (charAtJ === ' ') {
+                        tile.classList.add('space');
+                    } else {
+                        // Determine content
+                        let letter = "";
+                        if (i < guesses.length) {
+                            letter = guess[j] || ""; // Validated guess has spaces
+                        } else if (isCurrentRow) {
+                            // Map visual index to currentGuess index skipping spaces
+                            // We need to reconstruct the visual string from currentGuess (which has no spaces)
+                            // Or, easier: keep spaces in currentGuess?
+                            // Let's decide: currentGuess will ONLY contain letters.
+                            // We map it to the grid.
+                            
+                            // Count how many non-space chars before j
+                            const cleanTargetBefore = targetWord.substring(0, j).replace(/ /g, '').length;
+                            if (cleanTargetBefore < currentGuess.length) {
+                                letter = currentGuess[cleanTargetBefore];
+                            }
+                        }
+                        tile.textContent = letter;
+
+                        // Color logic for completed guesses
+                        if (i < guesses.length) {
+                            tile.classList.add(getTileColor(guess, j));
+                        } else if (letter) {
+                            tile.classList.add('filled');
+                        }
+                    }
+                    row.appendChild(tile);
+                }
+                board.appendChild(row);
+            }
+        }
+
+        function getTileColor(guess, index) {
+            // Logic to determine color. 
+            // Note: guess and targetWord have spaces at same positions if we enforce it.
+            // But let's handle "guess" as the full string including spaces.
+            
+            const letter = guess[index];
+            if (!letter || letter === ' ') return 'space';
+            
+            const targetChar = targetWord[index];
+            
+            if (targetChar === letter) {
+                return 'correct';
+            }
+
+            // Check for present
+            // Need to account for multiple instances
+            // Standard Wordle Logic:
+            // 1. Identify corrects.
+            // 2. Count remaining frequencies in target.
+            // 3. Mark present if available.
+            
+            // Let's do a full pass for the row colors
+            // But here we need to return for specific index. 
+            // It's cleaner to pre-calculate colors for the row, but we can compute on fly.
+            
+            let targetFreq = {};
+            let guessFreq = {}; // counts of 'correct' or 'present' assigned so far
+            
+            // Calculate target frequency ignoring 'correct' matches elsewhere?
+            // Standard way: 
+            // Count total letters in target
+            for (const char of targetWord) {
+                if(char !== ' ') targetFreq[char] = (targetFreq[char] || 0) + 1;
+            }
+
+            // Decrement for correct matches (Green)
+            for (let k = 0; k < targetWord.length; k++) {
+                if (targetWord[k] === guess[k]) {
+                    if(targetWord[k] !== ' ') targetFreq[targetWord[k]]--;
+                }
+            }
+
+            // Now check if current index is yellow
+            // We need to know if this specific instance of the letter should be yellow.
+            // It gets priority from left to right for the remaining available counts.
+            
+            let isYellow = false;
+            // Count how many of this letter appear before this index in the guess that were NOT green
+            // and use up the quota.
+            
+            let matchesBefore = 0;
+            for(let k = 0; k < index; k++) {
+                const gChar = guess[k];
+                const tChar = targetWord[k];
+                if (gChar === letter && tChar !== gChar) {
+                    matchesBefore++;
+                }
+            }
+
+            if (targetFreq[letter] > matchesBefore) {
+                return 'present';
+            }
+
+            return 'absent';
+        }
+
+        function createKeyboard() {
+            const layout = [
+                "QWERTYUIOP",
+                "ASDFGHJKL",
+                "ZXCVBNM" // Special handling for row 3
+            ];
+
+            keyboardContainer.innerHTML = '';
+
+            layout.forEach((rowStr, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'keyboard-row';
+
+                // Row 3: Backspace - Z...M - Enter
+                if (rowIndex === 2) {
+                    // Backspace
+                    const bsp = createKey("Backspace", "⌫", true);
+                    bsp.onclick = handleDelete;
+                    rowDiv.appendChild(bsp);
+
+                    rowStr.split('').forEach(char => {
+                        const key = createKey(char, char);
+                        key.onclick = () => handleInput(char);
+                        rowDiv.appendChild(key);
+                    });
+
+                    // Enter
+                    const ent = createKey("Enter", "ENTER", true);
+                    ent.onclick = handleEnter;
+                    rowDiv.appendChild(ent);
+
+                } else {
+                    rowStr.split('').forEach(char => {
+                        const key = createKey(char, char);
+                        key.onclick = () => handleInput(char);
+                        rowDiv.appendChild(key);
+                    });
+                }
+                keyboardContainer.appendChild(rowDiv);
+            });
+        }
+
+        function createKey(id, text, wide = false) {
+            const btn = document.createElement('button');
+            btn.className = `key ${wide ? 'wide' : ''}`;
+            btn.textContent = text;
+            btn.setAttribute('data-key', id);
+            return btn;
+        }
+
+        function resetKeyboard() {
+            document.querySelectorAll('.key').forEach(key => {
+                key.style.backgroundColor = '';
+                key.classList.remove('correct', 'present', 'absent');
+            });
+        }
+
+        function updateKeyboard(guess) {
+            for (let i = 0; i < guess.length; i++) {
+                const char = guess[i];
+                if (char === ' ') continue;
+                
+                const colorClass = getTileColor(guess, i);
+                const key = document.querySelector(`.key[data-key="${char}"]`);
+                
+                if (key) {
+                    // Priority: Correct > Present > Absent
+                    const currentClass = key.classList.contains('correct') ? 'correct' :
+                                         key.classList.contains('present') ? 'present' :
+                                         key.classList.contains('absent') ? 'absent' : '';
+                    
+                    if (colorClass === 'correct') {
+                        key.className = `key ${key.classList.contains('wide')?'wide':''} correct`;
+                    } else if (colorClass === 'present' && currentClass !== 'correct') {
+                         key.className = `key ${key.classList.contains('wide')?'wide':''} present`;
+                    } else if (colorClass === 'absent' && currentClass === '') {
+                         key.className = `key ${key.classList.contains('wide')?'wide':''} absent`;
+                    }
+                }
+            }
+        }
+
+        // Interaction Handlers
+        function handleInput(char) {
+            if (gameOver) return;
+            // Calculate max non-space chars
+            const maxLen = targetWord.replace(/ /g, '').length;
+            if (currentGuess.length < maxLen) {
+                currentGuess += char;
+                drawBoard();
+            }
+        }
+
+        function handleDelete() {
+            if (gameOver) return;
+            if (currentGuess.length > 0) {
+                currentGuess = currentGuess.slice(0, -1);
+                drawBoard();
+            }
+        }
+
+        function handleEnter() {
+            if (gameOver) return;
+            const maxLen = targetWord.replace(/ /g, '').length;
+            if (currentGuess.length !== maxLen) {
+                showMessage("Not enough letters");
+                return;
+            }
+            
+            // Reconstruct full string with spaces for validation/display
+            let fullGuess = "";
+            let ptr = 0;
+            for (let i = 0; i < targetWord.length; i++) {
+                if (targetWord[i] === ' ') {
+                    fullGuess += ' ';
+                } else {
+                    fullGuess += currentGuess[ptr];
+                    ptr++;
+                }
+            }
+
+            // Since we don't have a dictionary, we accept any combination
+            // (Standard Wordle checks dictionary here)
+            
+            submitGuess(fullGuess);
+        }
+
+        function submitGuess(fullGuess) {
+            guesses.push(fullGuess);
+            currentGuess = "";
+            
+            drawBoard();
+            updateKeyboard(fullGuess);
+
+            if (fullGuess === targetWord) {
+                showMessage("Splendid!", 2000);
+                gameOver = true;
+                setTimeout(() => {
+                    // Celebration?
+                }, 1500);
+            } else if (guesses.length >= maxGuesses) {
+                showMessage(`Game Over! Word: ${targetWord}`, 5000);
+                gameOver = true;
+            }
+        }
+
+        function showMessage(msg, duration = 1000) {
+            const container = document.getElementById('message-container');
+            const el = document.createElement('div');
+            el.className = 'message';
+            el.textContent = msg;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.classList.add('fade-out');
+                el.addEventListener('transitionend', () => el.remove());
+            }, duration);
+        }
+
+        // Keyboard events
+        document.addEventListener('keydown', (e) => {
+            if (gameOver) return;
+            const key = e.key.toUpperCase();
+            
+            if (key === 'ENTER') {
+                handleEnter();
+            } else if (key === 'BACKSPACE') {
+                handleDelete();
+            } else if (/^[A-Z]$/.test(key)) {
+                handleInput(key);
+            }
+        });
+
+        init();
+    </script>
+</body>
 </html>
